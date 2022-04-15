@@ -346,6 +346,9 @@ def get_url(url):
             result = response.status_code
         if result not in range(200,300):
             exit_err("[!] Error -u: "+url+" not found")
+
+        if str(response.url) != url:
+            exit_err("[!] Error -u: Your url "+url+" is redirected at "+str(response.url)+"\nPlease Enter correct url. If this is not the problem, you should may be entered cookies to confirm that you are authorized")
         return url
     except Exception as e:
         exit_err(str(e))
