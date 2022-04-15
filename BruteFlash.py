@@ -36,7 +36,8 @@ exit_success =  lambda x: sys.exit(Green+str(x)+Reset)
 
 # Display banner
 def banner():
-    infos = """[+] Name: BruteFlash
+    infos = """
+[+] Name: BruteFlash
 [+] Version: v1.0.0
 [+] Github: https://github.com/alexispondo/
 [+] Linkedin: https://www.linkedin.com/in/alexis-pondo/
@@ -55,6 +56,7 @@ d88'`?88P'd88'     `?88P'?8b  `?8b  `?888P'd88'        88b`?88P'`88b`?888P' d88'
                               ==============================                                                      
                               === by Alexis PONDO @pkaba ===                                                
                               ==============================                                                       
+
 """+infos+"""
 """
     return ban1
@@ -426,7 +428,8 @@ def main():
     cookies = get_cookie(args.C)
     verbose = args.v
 
-    print("""====================================================================================
+    print("""
+====================================================================================
                 BruteFlash v1.0.0 By Alexis PONDO (@pkaba)
 ====================================================================================
 [+] url:                        """+str(url)+"""
