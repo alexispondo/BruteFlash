@@ -1,7 +1,6 @@
 env
+.idea
 requirements.txt
 users.txt
 emails.txt
 passwords.txt
-.gitignore
-.idea
