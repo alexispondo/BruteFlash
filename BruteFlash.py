@@ -340,9 +340,9 @@ args = parser.parse_args()
 
 
 # Check url and return correct url or error
-def get_url(url):
+def get_url(url, cookies):
     try:
-        with requests.session().get(url) as response:
+        with requests.session().get(url, cookies=cookies) as response:
             result = response.status_code
         if result not in range(200,300):
             exit_err("[!] Error -u: "+url+" not found")
@@ -419,7 +419,7 @@ def get_cookie(cookie):
 def main():
     print(Yellow+banner()+Reset)
 
-    url = get_url(args.u)
+    url = get_url(args.u, get_cookie(args.C))
     login_data = get_login(args.l, args.L)
     password_data =get_password(args.p, args.P)
     method = get_method(args.m)
