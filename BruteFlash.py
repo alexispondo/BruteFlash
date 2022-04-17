@@ -76,7 +76,7 @@ def file_to_list(file):
     try:
         encoding = get_encoding(file)
         with open(file, "r", encoding=encoding, errors="ignore") as line:
-            lines = [i.split("\n")[0].lower() for i in line.readlines()]
+            lines = [i.split("\n")[0] for i in line.readlines()]
         return lines
     except Exception as e:
         exit_err(str(e))
