@@ -346,13 +346,13 @@ Please change them and use the correct information""")
 # Parser
 parser = argparse.ArgumentParser(usage= """
 - For Simple login page (without csrf token)
-$ python3 BruteFlash.py -u http://127.0.0.1/Web/con.php -l user -P passwords.txt --user username --passw passw --submit submit -e "Désolé" -v
+>>> python3 BruteFlash.py -u http://127.0.0.1/Web/con.php -l user -P passwords.txt --user username --passw passw --submit submit -e "Désolé" -v
 
 - For Secure login page (with csrf token)
-$ python3 BruteFlash.py -u http://127.0.0.1:8000/admin/ -l admin -P passwords.txt --user username --passw passw --submit Login --csrf csrfmiddlewaretoken -e "Username and/or password incorrect." -v
+>>> python3 BruteFlash.py -u http://127.0.0.1:8000/admin/ -l admin -P passwords.txt --user username --passw passw --submit Login --csrf csrfmiddlewaretoken -e "Username and/or password incorrect." -v
 
 - For Secure login page (with csrf token & Cookies)
-$ python3 BruteFlash.py -u  http://127.0.0.1:8000/admin2/ -l admin2 -P passwords.txt --user username --passw passw --submit Login --csrf csrfmiddlewaretoken -e "Username and/or password incorrect." -C "security: high, PHPSESSID: nbkttnti5kikvru5a4etei6oq8" -v\n """,
+>>> python3 BruteFlash.py -u  http://127.0.0.1:8000/admin2/ -l admin2 -P passwords.txt --user username --passw passw --submit Login --csrf csrfmiddlewaretoken -e "Username and/or password incorrect." -C "security: high, PHPSESSID: nbkttnti5kikvru5a4etei6oq8" -v\n """,
     description="Online bruteforce tool")
 
 
