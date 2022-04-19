@@ -2,7 +2,9 @@
 Coded By Alexis Pondo
 Github: http://github.com/alexispondo/
 Linkedin: https://www.linkedin.com/in/alexis-pondo/
+
 Note: Use this tool on websites that you own or with the permission of the website owner, I am in no way responsible for anything you do with it.
+
 Usage:
 - For Simple login page (without csrf token)
 $  python3 BruteFlash.py -u http://127.0.0.1/Web/con.php -l user -P passwords.txt --user username --passw passw --submit submit -e "Désolé" -v

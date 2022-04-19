@@ -1,4 +1,7 @@
 # TUTORIAL
+Click on the video to see the tutorial:
+
+[![How to use BruteFlash ](https://user-images.githubusercontent.com/47490330/164007194-8bf783b8-9b6a-466d-b580-512732e84295.png)](https://youtu.be/SpmlBQNpE5c?t=1s "How to use BruteFlash ")
 
 # DESCRIPTION
 
